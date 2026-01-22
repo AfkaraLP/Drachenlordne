@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Text Replacer",
+  "name": "Drachenlordne",
   "version": "1.0",
-  "description": "A Chrome extension to replace text on web pages",
+  "description": "A Firefox extension to replace all endings of en with ne",
   "permissions": [
     "activeTab"
   ],
