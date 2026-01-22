@@ -1,39 +1,74 @@
-replaceTextInElement(document.body);
-document.body.setAttribute('data-processed', 'true');
+function processPage() {
+  if (window.drachenlordProcessed) return;
+  window.drachenlordProcessed = true;
 
-const observer = new MutationObserver(mutations => {
-  mutations.forEach(mutation => {
-    mutation.addedNodes.forEach(node => {
-      if (node.nodeType === Node.TEXT_NODE) {
-        node.textContent = processText(node.textContent);
-      } else if (node.nodeType === Node.ELEMENT_NODE) {
-        replaceTextInElement(node);
-      }
-    });
-  });
-});
-observer.observe(document.body, {
-  childList: true,
-  subtree: true
-});
+  if (window.drachenlordObserver) {
+    window.drachenlordObserver.disconnect();
+  }
 
-function replaceTextInElement(element) {
-  if (!element.hasAttribute('data-processed')) {
-    if (element.childNodes.length) {
-      element.childNodes.forEach(child => {
-        switch (child.nodeType) {
-          case Node.ELEMENT_NODE:
-            replaceTextInElement(child);
-            break;
-          case Node.TEXT_NODE:
-            child.textContent = processText(child.textContent);
-            break;
+  setTimeout(() => {
+    processTextNodes();
+
+    const observer = new MutationObserver((mutations) => {
+      let shouldProcess = false;
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+          shouldProcess = true;
         }
       });
+
+      if (shouldProcess) {
+        setTimeout(processTextNodes, 100);
+      }
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    window.drachenlordObserver = observer;
+  }, 1000);
+}
+
+function processTextNodes() {
+  const walker = document.createTreeWalker(
+    document.body,
+    NodeFilter.SHOW_TEXT,
+    {
+      acceptNode: function(node) {
+        if (node.parentNode.tagName === 'SCRIPT' ||
+          node.parentNode.tagName === 'STYLE' ||
+          node.parentNode.classList.contains('drachenlord-processed')) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    },
+    false
+  );
+
+  let textNode;
+  const processedNodes = [];
+
+  while (textNode = walker.nextNode()) {
+    const originalText = textNode.textContent;
+    const processedText = processText(originalText);
+    if (originalText !== processedText) {
+      textNode.parentNode.classList.add('drachenlord-processed');
+      textNode.textContent = processedText;
+      processedNodes.push(textNode);
     }
-    element.setAttribute('data-processed', 'true');
   }
 }
+
+if (document.readyState === 'complete') {
+  processPage();
+} else {
+  window.addEventListener('load', processPage);
+}
+
+
 
 function processText(text) {
   return text.split(/(\W+)/).map(part => {
