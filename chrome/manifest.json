@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Drachenlordne",
   "version": "1.0",
-  "description": "A Firefox extension to replace all endings of en with ne",
+  "description": "A Chrome extension to replace all endings of en with ne",
   "permissions": [
     "activeTab"
   ],
