@@ -2,10 +2,8 @@
   "manifest_version": 2,
   "name": "Drachenlordne",
   "version": "1.0",
-  "description": "A Firefox extension to replace all endings of en with ne",
-   "permissions": [
-     "activeTab"
-   ],
+  "description": "Drachenlord your browsing - A Firefox extension to replace all endings of en with ne",
+   "permissions": [],
    "icons": {
      "16": "icon16.png",
      "48": "icon48.png",
